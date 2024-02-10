@@ -1,11 +1,11 @@
-const { PrismaClient } = require("@prisma/client")
-const prisma = new PrismaClient()
+import { db } from "../app/lib/db"
 
 async function main() {
-    await prisma.user.create({
+    await db.user.create({
         data: {
             email: `test@gmail.com`,
-            username: 'test'
+            username: 'test',
+            password: 'test123'
         }
     })
 }
@@ -16,5 +16,5 @@ main()
     process.exit(1)
     })
     .finally(async () => {
-    await prisma.$disconnect()
+    await db.$disconnect()
     })
