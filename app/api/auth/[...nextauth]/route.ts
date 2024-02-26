@@ -33,11 +33,47 @@ const handler = NextAuth({
                     return null
                 }
                 return {
+                    ...user,
                     id: user.id,
                     username: user.username
                 }
         }
-    })]
+    })],
+    callbacks: {
+        async jwt({ token, user, session }) {
+            try {
+              console.log("jwt", { token, user, session })
+      
+              if (user) {
+                return {
+                  ...token,
+                  id: user.id,
+                }
+              }
+      
+              return token
+            } catch (error) {
+              console.error("Error in jwt:", error);
+              throw error;
+            }
+          },
+          async session({ session, token, user }) {
+            try {
+              console.log("session", { session, token, user })
+      
+              return {
+                ...session,
+                user: {
+                  ...session.user,
+                  id: session.user.id,
+                }
+              };
+            } catch (error) {
+              console.error("Error in session:", error)
+              throw error
+            }
+          },
+    }
 })
 
 export { handler as GET, handler as POST}

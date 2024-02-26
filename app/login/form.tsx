@@ -18,7 +18,7 @@ export default async function Form() {
         if (response?.error) {
           console.log(response.error)
         } else {
-          router.push("/")
+          router.push("/profile")
           router.refresh()
         }
     }
