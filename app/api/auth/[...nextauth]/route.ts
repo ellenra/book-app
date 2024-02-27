@@ -43,7 +43,7 @@ const handler = NextAuth({
         async jwt({ token, user, session }) {
             try {
               console.log("jwt", { token, user, session })
-      
+              token.id = user?.id
               if (user) {
                 return {
                   ...token,
@@ -53,21 +53,20 @@ const handler = NextAuth({
       
               return token
             } catch (error) {
-              console.error("Error in jwt:", error);
-              throw error;
+              console.error("Error in jwt:", error)
+              throw error
             }
           },
           async session({ session, token, user }) {
             try {
               console.log("session", { session, token, user })
-      
               return {
                 ...session,
                 user: {
                   ...session.user,
-                  id: session.user.id,
+                  id: token.id
                 }
-              };
+              }
             } catch (error) {
               console.error("Error in session:", error)
               throw error

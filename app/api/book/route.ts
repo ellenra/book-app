@@ -1,23 +1,45 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest, NextResponse } from "next/server"
 import { db } from '@/app/lib/db'
 
-export async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function handler(req: Request, res: Response) {
   try {
-    if (req.method === 'POST') {
+    if (req.method === 'GET') {
+      await handleGet(req, res)
+    } else if (req.method === 'POST') {
       await handlePost(req, res)
     } else {
-      res.status(405).json({ message: 'Method not allowed' })
+      return NextResponse.json({ message: 'Method not allowed' }, { status: 405})
     }
   } catch (error) {
     console.error('Error in API', error)
-    res.status(500).json({ message: 'Internal server error' })
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+export async function handleGet(req: Request, res: Response) {
   try {
-      const { title, author, state, end_date, rating, comment } = req.body
+    const books = await db.book.findMany()
+    console.log(books)
+    return NextResponse.json({ books: books }, { status: 200 })
+  } catch (error) {
+    console.error('Error in handleGet', error)
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
+  }
+}
+
+
+export async function handlePost(req: Request, res: Response) {
+  try {
+      const { title, author, state, end_date, rating, comment, email } = await req.json()
       console.log(req.body)
+      const user = await db.user.findUnique({
+        where: {
+          email: email
+        }
+      })
+      if (!user) {
+        return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      }
       const newBook = await db.book.create({
         data: {
           title: title,
@@ -26,16 +48,16 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           end_date: end_date,
           rating: rating,
           comment: comment,
-          userId: req.body.id,
+          userId: user.id,
         },
       })
       console.log(newBook)
-      res.status(201).json({ book: newBook, message: 'Added book' })
+      return NextResponse.json({ book: newBook, message: 'Added book' }, { status: 201 })
 
   } catch (error) {
     console.error('Error adding book:', error)
-    res.status(500).json({ message: 'Error adding book' })
+    return NextResponse.json({ message: 'Error adding book' }, { status: 500 })
   }
 }
 
-export { handlePost as POST}
+export { handlePost as POST, handleGet as GET}

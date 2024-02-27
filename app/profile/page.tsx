@@ -24,16 +24,14 @@ export default function ProfilePage({ onSubmit }: BookFormProps) {
 
     const handleBook = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault() 
-        console.log(session.user.id);
-
+        console.log(session.user.email)
         const response = await fetch(`/api/book`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({ ...formData, id: session.user.id })
+            body: JSON.stringify({ ...formData, email: session.user.email })
         })
         if (response.ok) {
           console.log({ response })
-          onSubmit(formData)
           setFormData({
             title: '',
             author: '',
