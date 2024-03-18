@@ -19,7 +19,6 @@ export async function handler(req: Request, res: Response) {
 export async function handleGet(req: Request, res: Response) {
   try {
     const books = await db.book.findMany()
-    console.log(books)
     return NextResponse.json({ books: books }, { status: 200 })
   } catch (error) {
     console.error('Error in handleGet', error)
